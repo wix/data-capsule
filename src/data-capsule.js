@@ -11,10 +11,13 @@ function validateNamespace(options) {
 }
 
 class DataCapsule extends BaseStorage {
-  constructor({strategy, namespace, scope}) {
+  constructor({strategy, namespace, scope, expiration}) {
     super();
     this.storageStrategy = BaseStorage.verify(strategy);
     this._options = {namespace, scope};
+    if (expiration !== undefined) {
+      this._options.expiration = expiration;
+    }
   }
 
   _buildValidateOptions(capsuleOptions, options) {

@@ -4,8 +4,9 @@ const {NOT_FOUND} = require('../utils/constants');
 const BaseStorage = require('../base-storage');
 const LocalStorageStrategy = require('./local-storage');
 const DELETED = '___DELETED___';
+export const DEFAULT_EXPIRATION = 3600;
 
-class CachedStorageStrategy extends BaseStorage {
+export class CachedStorageStrategy extends BaseStorage {
   constructor({remoteStrategy, localStrategy = new LocalStorageStrategy()}) {
     super();
     this.remoteStrategy = BaseStorage.verify(remoteStrategy);
@@ -17,7 +18,7 @@ class CachedStorageStrategy extends BaseStorage {
   }
 
   _cacheItem(key, value, options) {
-    return this.localStrategy.setItem(key, value, Object.assign(options, {expiration: 3600}));
+    return this.localStrategy.setItem(key, value, Object.assign({expiration: DEFAULT_EXPIRATION}, options));
   }
 
   setItem(key, value, options) {
@@ -68,5 +69,3 @@ class CachedStorageStrategy extends BaseStorage {
       );
   }
 }
-
-module.exports = CachedStorageStrategy;

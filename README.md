@@ -32,12 +32,15 @@ const {DataCapsule, LocalStorageStrategy} = DataCapsuleTools;
 
 DataCapsule is the one responsible for your needs. When you create a capsule you must provide a `strategy` (see below) for *how* data will be saved. In addition, you can optionally provide a `namespace` and `scope` for your capsule. If you didn't provide `namespace` in constructor, you must do so for each operation you do on the capsule. However, `scope` is optional. The idea is that `namespace` distinguishes your data from other applications who are using the same strategy (for example in case of localstorage, other applications that run in the same origin), and `scope` distinguishes your data from data the same application might write when in different context (for example, user id is often used as `scope`). Even if you provided `namespace` and `scope` in constructor, you may override it for specific operation by passing different `namespace` or `scope` when passing `options` to one of the capsule's methods.
 
+In addition, you can pass in an optional expiration which will be passed on to the different strategies.
+
 ```js
 constructor(options) {
   // options: {
   //   strategy: Any class which implements BaseStorage (see below)
   //   namespace: String (optional)
   //   scope: String (optional)
+  //   expiration: Number (optional)
   // }
 }
 ```
@@ -75,7 +78,7 @@ console.log(await capsule.getItem('shahata')); // logs 123
 
 ## CachedStorage
 
-Constructor accepts `options` object with `remoteStrategy` and `localStrategy`. Get operations are first tried against `localStrategy` and if no local cache exists, we then fallback to `remoteStrategy` and eventually cache to `localStrategy`. Set operations are cached to `localStrategy` as well. Note that `localStrategy` cache is always set with expiration period of one hour in order to avoid stale cache issues. The `localStrategy` is `new LocalStorageStrategy()` by default, so you don't have to pass it, but anyway you are better off using the short form below:
+Constructor accepts `options` object with `remoteStrategy` and `localStrategy`. Get operations are first tried against `localStrategy` and if no local cache exists, we then fallback to `remoteStrategy` and eventually cache to `localStrategy`. Set operations are cached to `localStrategy` as well. Note that `localStrategy` cache is always set with expiration period of one hour in order to avoid stale cache issues. However, if you wish, you can override the expiration period by passing in the expiration option. (pass `null` to completely remove the expiration). The `localStrategy` is `new LocalStorageStrategy()` by default, so you don't have to pass it, but anyway you are better off using the short form below:
 
 ```js
 import {DataCapsule, CachedStorageStrategy, LocalStorageStrategy, WixStorageStrategy} from 'data-capsule';

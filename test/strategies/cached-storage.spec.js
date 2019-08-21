@@ -4,10 +4,12 @@ const nock = require('nock');
 const sinon = require('sinon');
 const {expect} = require('chai');
 const {LocalStorage} = require('node-localstorage');
+const {DEFAULT_EXPIRATION} = require('../../src/strategies/cached-storage');
 const {NOT_FOUND, WixStorageStrategy, CachedStorageStrategy, LocalStorageCachedCapsule} = require('../../src');
 
 describe('cached-storage-strategy', () => {
   beforeEach(() => {
+    nock.cleanAll();
     global.localStorage = new LocalStorage('./scratch');
   });
 
@@ -63,11 +65,41 @@ describe('cached-storage-strategy', () => {
     nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
       .reply(200, {shahata: 123});
     expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
-    clock.tick(3600000);
+    clock.tick(DEFAULT_EXPIRATION * 1000);
     nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
       .reply(200, {shahata: 123});
     expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    expect(nock.isDone()).to.be.true;
     expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    clock.restore();
+  });
+
+  it('should allow to disable the expiration time', async () => {
+    const clock = sinon.useFakeTimers();
+    const capsule = new LocalStorageCachedCapsule({remoteStrategy: new WixStorageStrategy(), expiration: null});
+    nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
+      .reply(200, {shahata: 123});
+    expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    clock.tick(DEFAULT_EXPIRATION * 2000);
+    nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
+      .reply(200, {shahata: 123});
+    expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    expect(nock.isDone()).to.be.false;
+    clock.restore();
+  });
+
+  it('should allow to pass a custom expiration time', async () => {
+    const differentExpiration = 666;
+    const clock = sinon.useFakeTimers();
+    const capsule = new LocalStorageCachedCapsule({remoteStrategy: new WixStorageStrategy(), expiration: differentExpiration});
+    nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
+      .reply(200, {shahata: 123});
+    expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    clock.tick(differentExpiration * 1000);
+    nock('http://localhost').get('/_api/wix-user-preferences-webapp/getVolatilePrefForKey/wix/shahata')
+      .reply(200, {shahata: 123});
+    expect(await capsule.getItem('shahata', {namespace: 'wix'})).to.equal(123);
+    expect(nock.isDone()).to.be.true;
     clock.restore();
   });
 
