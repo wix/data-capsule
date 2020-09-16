@@ -26,7 +26,9 @@ export class DataCapsule extends BaseStorage {
 
 export class LocalStorageStrategy extends BaseStorage {}
 export class WixStorageStrategy extends BaseStorage {}
-export class CachedStorageStrategy extends BaseStorage {}
+export class CachedStorageStrategy extends BaseStorage {
+  constructor(options: { remoteStrategy: RemoteStrategy, localStrategy: LocalStrategy })
+}
 export class InMemoryStorageStrategy extends BaseStorage {}
 
 export class FrameStorageStrategy extends BaseStorage {
@@ -50,3 +52,6 @@ export const COOKIE_CONSENT_DISALLOWED: Error;
 export const LocalStorageCapsule: (options: Options) => DataCapsule;
 export const LocalStorageCachedCapsule: (options: Options) => DataCapsule;
 export const InMemoryStorageCapsule: (options: Options) => DataCapsule;
+
+export type RemoteStrategy = WixStorageStrategy;
+export type LocalStrategy = LocalStorageStrategy | InMemoryStorageStrategy;
