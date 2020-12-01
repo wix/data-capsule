@@ -23,8 +23,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "greedy-split": "^1.0.0",
-    "message-channel": "^2.0.0",
-    "tslib": "^2.0.0"
+    "message-channel": "^2.0.0"
   },
   "private": false,
   "devDependencies": {
