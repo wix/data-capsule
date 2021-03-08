@@ -45,7 +45,7 @@
     "protractor": "^5.4.3",
     "sinon": "^9.0.1",
     "typescript": "^3.9.7",
-    "yoshi": "^4.47.1"
+    "@wix/yoshi": "^4.47.1"
   },
   "eslintConfig": {
     "extends": "yoshi"
